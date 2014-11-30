@@ -14,6 +14,11 @@ ENV JENKINS_HOME /var/jenkins_home
 RUN usermod -m -d "$JENKINS_HOME" jenkins && chown -R jenkins "$JENKINS_HOME"
 VOLUME /var/jenkins_home
 
+RUN cd /tmp \
+  && curl -L -O https://dl.bintray.com/sbt/debian/sbt-0.13.7.deb \
+  && dpkg -i sbt-0.13.7.deb \
+  && rm sbt-0.13.7.deb
+
 # for main web interface:
 EXPOSE 8080
 
