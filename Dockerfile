@@ -1,17 +1,23 @@
 FROM java:7
 
-RUN apt-get update && apt-get install -y wget git curl zip && rm -rf /var/lib/apt/lists/*
+RUN groupadd -g 999 docker \
+  && apt-get update \
+  && apt-get install -y wget git curl zip docker.io \
+  && rm -rf /var/lib/apt/lists/*
 
 ENV JENKINS_VERSION 1.591
-RUN mkdir /usr/share/jenkins/
-RUN useradd -d /home/jenkins -m -s /bin/bash jenkins
 
 COPY init.groovy /tmp/WEB-INF/init.groovy.d/tcp-slave-angent-port.groovy
-RUN curl -L http://updates.jenkins-ci.org/download/war/$JENKINS_VERSION/jenkins.war -o /usr/share/jenkins/jenkins.war \
-  && cd /tmp && zip -g /usr/share/jenkins/jenkins.war WEB-INF/init.groovy.d/tcp-slave-angent-port.groovy && rm -rf /tmp/WEB-INF
+RUN mkdir /usr/share/jenkins/ \
+  && curl -L http://updates.jenkins-ci.org/download/war/$JENKINS_VERSION/jenkins.war -o /usr/share/jenkins/jenkins.war \
+  && cd /tmp \
+  && zip -g /usr/share/jenkins/jenkins.war WEB-INF/init.groovy.d/tcp-slave-angent-port.groovy \
+  && rm -rf /tmp/WEB-INF
 
 ENV JENKINS_HOME /var/jenkins_home
-RUN usermod -m -d "$JENKINS_HOME" jenkins && chown -R jenkins "$JENKINS_HOME"
+RUN useradd -d "$JENKINS_HOME" -m -s /bin/bash -G docker jenkins \
+  && chown -R jenkins "$JENKINS_HOME"
+
 VOLUME /var/jenkins_home
 
 RUN cd /tmp \
