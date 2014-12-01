@@ -25,6 +25,8 @@ RUN cd /tmp \
   && dpkg -i sbt-0.13.7.deb \
   && rm sbt-0.13.7.deb
 
+RUN curl -L https://github.com/docker/fig/releases/download/1.0.1/fig-`uname -s`-`uname -m` > /usr/local/bin/fig; chmod +x /usr/local/bin/fig
+
 # for main web interface:
 EXPOSE 8080
 
